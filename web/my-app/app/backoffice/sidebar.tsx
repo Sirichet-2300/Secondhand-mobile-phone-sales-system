@@ -12,6 +12,9 @@ export default function Sidebar() {
   const router = useRouter();
   const [level, setLevel] = useState("");
   const [isShow, setShowModal] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleShowModal = () => {
     setShowModal(true);
@@ -32,6 +35,7 @@ export default function Sidebar() {
       headers:headers });
     setName(res.data.name);
     setLevel(res.data.level);
+    setUsername(res.data.username);
   }
 
 useEffect(() => {
@@ -42,6 +46,30 @@ useEffect(() => {
     localStorage.removeItem("token");
     router.push("/");
   }
+
+  const handleSave = async () => {
+    if(password !== confirmPassword){
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'password ไม่ตรงกัน'
+      });
+      return;
+    }
+    //save data
+    const payload = {
+      name: name,
+      username: username,
+      password: password,
+      level: level
+    }
+    const token = localStorage.getItem("token");
+    const headers = {'Authorization': `Bearer ${token}`}
+    await axios.put(`${config.apiUrl}/user/update`, payload, { headers })
+      fetchData()
+      handleCloseModal()
+    }
+
 
   return (
     <div className="bg-teal-600 h-screen w-64 ">
@@ -104,19 +132,23 @@ useEffect(() => {
       <Modal title="แก้ไขข้อมูลผู้ใช้งาน"isOpen={isShow} onClose={handleCloseModal}>
         <div>
           <div>ชื่อผู้ใช้งาน</div>
-          <input type="text" className="form-control"/>
+          <input type="text" value={name} onChange={(e)=> setName(e.target.value)} 
+          className="form-control"/>
 
           <div className="mt-3">username</div>
-          <input type="text" className="form-control"/>
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} 
+          className="form-control"/>
 
           <div className="mt-3">password</div>
-          <input type="password" className="form-control"/>
+          <input type="password"  onChange={(e) => setPassword(e.target.value)} 
+          className="form-control"/>
 
           <div className="mt-3">confirm password</div>
-          <input type="password" className="form-control"/>
+          <input type="password"  onChange={(e) => setConfirmPassword(e.target.value)} 
+          className="form-control"/>
 
           <div className="mt-3">
-            <button className="btn">
+            <button className="btn" onClick={handleSave}>
               <i className="fa-solid fa-save mr-2"> บันทึก</i>
             </button>
           </div>
