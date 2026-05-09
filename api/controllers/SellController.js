@@ -1,4 +1,4 @@
-const {PrismaClient} = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 module.exports = {
@@ -7,16 +7,14 @@ module.exports = {
             try {
                 const serial = req.body.serial;
                 const product = await prisma.product.findFirst({
-                    
-                    where: { serial:serial },
+
+                    where: { serial: serial },
                 });
-                console.log("Product: ", product);
-                console.log(req.body.serial);
                 if (!product) {
                     res.status(400).json({ error: 'Product not found.' });
                     return;
                 }
-                
+
                 await prisma.sell.create({
                     data: {
                         productId: product.id,
@@ -25,10 +23,37 @@ module.exports = {
                     },
                 });
                 res.json({ message: 'Sell record created successfully.' });
-                
+
             } catch (error) {
-                res.status(500).json({ message:error.message });
+                res.status(500).json({ message: error.message });
             }
-        }
+        },
+        list: async (req, res) => {
+            try {
+                const sells = await prisma.sell.findMany({
+                    where: {
+                        status: 'pending',
+                    },
+                    orderBy: {
+                        id: 'desc',
+                    },
+                    include: {
+                        product: true
+                    }
+                });
+                res.json(sells);
+            } catch (error) {
+                res.status(500).json({ message: error.message });
+            }
+        },
+        remove: async (req, res) => {
+            try {
+                await prisma.sell.delete({
+                    where: { id: req.params.id },
+                });
+                res.json({ message: 'Sell record removed successfully.' });
+            } catch (error) {
+                res.status(500).json({ message: error.message });
+            }
     }
-}
+}}

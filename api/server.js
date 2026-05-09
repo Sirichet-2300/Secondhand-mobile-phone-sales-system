@@ -32,6 +32,8 @@ app.post("/api/buy/create", ProductController.create);
 
 //sell
 app.post("/api/sell/create", SellController.create);
+app.get("/api/sell/list", SellController.list);
+app.delete("/api/sell/remove/:id", SellController.remove);
 // ✅ listen() always last
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

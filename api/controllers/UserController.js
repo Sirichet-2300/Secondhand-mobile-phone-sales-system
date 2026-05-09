@@ -53,7 +53,7 @@ module.exports = {
                 const oldUser = await prisma.user.findFirst({
                     where: { id: decoded.id},
                 });
-                const newPassword = req.body.password !== undefined ? req.body.password : oldUser.password;
+                const newPassword = req.body.password !== "" ? req.body.password : oldUser.password;
                 await prisma.user.update({
                     where: { id: decoded.id },
                     data: {
