@@ -41,6 +41,15 @@ model Product {
   customerPhone String
   customerAddress String
   remark      String
-  status      String @default("intock")
-  
+  status      String @default("instock")
+  sell    Sell[]
+}
+
+model Sell {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  productId String @db.ObjectId
+  status    String @default("pending")
+  price     Int 
+  payDate   DateTime 
 }

@@ -18,7 +18,7 @@ module.exports = {
                         status: 'active'
                     }
                 });
-
+                console.log("User: ", user);
                 if (!user) return res.status(401).json({message: 'User not found'});
 
                 const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '7d'});
