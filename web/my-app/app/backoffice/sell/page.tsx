@@ -33,11 +33,11 @@ export default function Page() {
             setSells(response.data);
             // Calculate total amount
             let total = 0;
-            for (let i = 0;i<response.data.length;i++) {
+            for (let i = 0; i < response.data.length; i++) {
                 total += response.data[i].price;
             }
             setTotalAmount(total);
-        } catch (error:any) {
+        } catch (error: any) {
             Swal.fire({
                 icon: "error",
                 title: "เกิดข้อผิดพลาด",
@@ -59,9 +59,10 @@ export default function Page() {
                 showConfirmButton: true,
             });
             if (button.isConfirmed) {
-            await axios.delete(`${config.apiUrl}/sell/remove/${id}`);
-            fetchData();}
-        } catch (error :any) {
+                await axios.delete(`${config.apiUrl}/sell/remove/${id}`);
+                fetchData();
+            }
+        } catch (error: any) {
             Swal.fire({
                 icon: "error",
                 title: "เกิดข้อผิดพลาด",
@@ -70,7 +71,28 @@ export default function Page() {
         }
     };
 
-    
+    const handleConfirmSell = async () => {
+        try {
+            const button = await Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to confirm the sell records!",
+                icon: "question",
+                showCancelButton: true,
+                showConfirmButton: true,
+            });
+            if (button.isConfirmed) {
+                await axios.get(`${config.apiUrl}/sell/confirm`);
+                fetchData();
+            }
+        } catch (error: any) {
+            Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: "Failed to confirm sell records",
+            });
+        }
+    };
+
 
     return (
         <div>
@@ -116,19 +138,24 @@ export default function Page() {
                     ))}
                 </tbody>
             </table>
-            <div className="mt-5 flex justify-between">
-                <div>ยอดรวมทั้งหมด</div>
-                <div className="text-2xl font-bold bg-gray-300 px-4 py-2 rounded-md">
-                    {totalAmount.toLocaleString()}
 
-                </div>
-            </div>
+            {sells.length > 0 && (
+                <>
+                    <div className="mt-5 flex justify-between">
+                        <div>ยอดรวมทั้งหมด</div>
+                        <div className="text-2xl font-bold bg-gray-300 px-4 py-2 rounded-md">
+                            {totalAmount.toLocaleString()}
 
-            <div className="mt-5 text-center">
-                <button className="btn">
-                    <i className="fa-solid fa-check mr-2">ยืนยันการขาย</i>
-                </button>
-            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 text-center">
+                        <button className="btn" onClick={handleConfirmSell}>
+                            <i className="fa-solid fa-check mr-2">ยืนยันการขาย</i>
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
 
 

@@ -55,5 +55,19 @@ module.exports = {
             } catch (error) {
                 res.status(500).json({ message: error.message });
             }
+    },
+    confirm: async (req, res) => {
+        try {
+            await prisma.sell.updateMany({
+                where: { status: 'pending' },
+                data: { status: 'paid',
+                    payDate: new Date()
+                 },
+            });
+            res.json({ message: 'Sell records confirmed successfully.' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     }
-}}
+}
+}
