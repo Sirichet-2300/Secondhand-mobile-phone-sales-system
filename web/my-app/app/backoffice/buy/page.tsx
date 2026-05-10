@@ -22,21 +22,21 @@ export default function Page() {
   const [qty, setQty] = useState("0");
 
   const fetchData = async () => {
-  try {
-    const response = await axios.get(`${config.apiUrl}/buy/list`);
-    setProducts(response.data);
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "เกิดข้อผิดพลาดในการดึงข้อมูล",
-      text: "ไม่สามารถโหลดข้อมูลได้",
-    });
-  }
-};
+    try {
+      const response = await axios.get(`${config.apiUrl}/buy/list`);
+      setProducts(response.data);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาดในการดึงข้อมูล",
+        text: "ไม่สามารถโหลดข้อมูลได้",
+      });
+    }
+  };
 
-useEffect(() => {
-  fetchData(); // ✅ still called on mount
-}, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleOpenModal = () => {
     setIsOpen(true);
@@ -59,7 +59,7 @@ useEffect(() => {
         remark: remark,
         qty: qty,
       };
-      if(id === 0) {
+      if (id === 0) {
         await axios.post(`${config.apiUrl}/buy/create`, payload);
       } else {
         await axios.put(`${config.apiUrl}/buy/update/${id}`, payload);
@@ -100,33 +100,33 @@ useEffect(() => {
   };
 
   const handleDelete = async (id: number) => {
-  try {
-    const button = await Swal.fire({
-      title: "คุณแน่ใจหรือไม่?",
-      icon: "question",
-      showCancelButton: true,
-      showConfirmButton: true,
-    });
+    try {
+      const button = await Swal.fire({
+        title: "คุณแน่ใจหรือไม่?",
+        icon: "question",
+        showCancelButton: true,
+        showConfirmButton: true,
+      });
 
-    if (button.isConfirmed) {
-      await axios.delete(`${config.apiUrl}/buy/remove/${id}`);
-      
+      if (button.isConfirmed) {
+        await axios.delete(`${config.apiUrl}/buy/remove/${id}`);
+
+        Swal.fire({
+          icon: "success",
+          title: "ลบรายการสำเร็จ",
+          timer: 2000,
+        }); // ✅ 1. show success message
+
+        fetchData(); // ✅ 2. refresh the list
+      }
+    } catch (error: any) {
       Swal.fire({
-        icon: "success",
-        title: "ลบรายการสำเร็จ",
-        timer: 2000,
-      }); // ✅ 1. show success message
-
-      fetchData(); // ✅ 2. refresh the list
+        icon: "error",
+        title: "เกิดข้อผิดพลาดในการลบรายการ",
+        text: "ไม่สามารถลบข้อมูลได้",
+      });
     }
-  } catch (error: any) {
-    Swal.fire({
-      icon: "error",
-      title: "เกิดข้อผิดพลาดในการลบรายการ",
-      text: "ไม่สามารถลบข้อมูลได้",
-    });
-  }
-};
+  };
 
   const handleClear = () => {
     setSerial("");
@@ -155,14 +155,14 @@ useEffect(() => {
         <table className="table mt-3">
           <thead>
             <tr>
-              <th>Serial</th>
-              <th>ชื่อสินค้า</th>
-              <th>รุ่น</th>
-              <th>สี</th>
-              <th>ราคา</th>
-              <th>ลูกค้า</th>
-              <th>เบอร์โทรศัพท์</th>
-              <th>หมายเหตุ</th>
+              <th className="text-left">Serial</th>
+              <th className="text-left">ชื่อสินค้า</th>
+              <th className="text-left">รุ่น</th>
+              <th className="text-left">สี</th>
+              <th className="text-right pr-0">ราคา</th>
+              <th className="text-left">ลูกค้า</th>
+              <th className="text-left">เบอร์โทรศัพท์</th>
+              <th className="text-left">หมายเหตุ</th>
               <th className="w-[110px]"></th>
             </tr>
           </thead>
@@ -173,7 +173,7 @@ useEffect(() => {
                 <td>{product.name}</td>
                 <td>{product.release}</td>
                 <td>{product.color}</td>
-                <td>{product.price}</td>
+                <td className="text-right">{product.price.toLocaleString()}</td>
                 <td>{product.customerName}</td>
                 <td>{product.customerPhone}</td>
                 <td>{product.remark}</td>

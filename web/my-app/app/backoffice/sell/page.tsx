@@ -11,6 +11,7 @@ export default function Page() {
     const [price, setPrice] = useState(0);
     const [sells, setSells] = useState([]);
     const [id, setId] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
 
     const handleSave = async () => {
         try {
@@ -30,6 +31,12 @@ export default function Page() {
         try {
             const response = await axios.get(`${config.apiUrl}/sell/list`);
             setSells(response.data);
+            // Calculate total amount
+            let total = 0;
+            for (let i = 0;i<response.data.length;i++) {
+                total += response.data[i].price;
+            }
+            setTotalAmount(total);
         } catch (error:any) {
             Swal.fire({
                 icon: "error",
@@ -44,8 +51,16 @@ export default function Page() {
 
     const handleDelete = async (id: number) => {
         try {
+            const button = await Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                showConfirmButton: true,
+            });
+            if (button.isConfirmed) {
             await axios.delete(`${config.apiUrl}/sell/remove/${id}`);
-            fetchData();
+            fetchData();}
         } catch (error :any) {
             Swal.fire({
                 icon: "error",
@@ -54,6 +69,8 @@ export default function Page() {
             });
         }
     };
+
+    
 
     return (
         <div>
@@ -89,7 +106,7 @@ export default function Page() {
                         <tr key={item.id}>
                             <td>{item.product.serial}</td>
                             <td>{item.product.name}</td>
-                            <td className="text-right">{item.price}</td>
+                            <td className="text-right">{item.price.toLocaleString()}</td>
                             <td className="text-center">
                                 <button className="btn-delete" onClick={() => handleDelete(item.id)}>
                                     <i className="fa-solid fa-trash-alt"></i>
@@ -99,6 +116,19 @@ export default function Page() {
                     ))}
                 </tbody>
             </table>
+            <div className="mt-5 flex justify-between">
+                <div>ยอดรวมทั้งหมด</div>
+                <div className="text-2xl font-bold bg-gray-300 px-4 py-2 rounded-md">
+                    {totalAmount.toLocaleString()}
+
+                </div>
+            </div>
+
+            <div className="mt-5 text-center">
+                <button className="btn">
+                    <i className="fa-solid fa-check mr-2">ยืนยันการขาย</i>
+                </button>
+            </div>
         </div>
 
 
