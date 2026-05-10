@@ -8,7 +8,9 @@ module.exports = {
                 const serial = req.body.serial;
                 const product = await prisma.product.findFirst({
 
-                    where: { serial: serial },
+                    where: { serial: serial,
+                        status: 'instock'
+                     },
                 });
                 if (!product) {
                     res.status(400).json({ error: 'Product not found.' });
@@ -37,9 +39,16 @@ module.exports = {
                     orderBy: {
                         id: 'desc',
                     },
-                    include: {
-                        product: true
-                    }
+                    select: {
+                        product: {
+                            select: {
+                                name: true,
+                                serial: true,
+                            }
+                        },
+                        id: true,
+                        price: true,
+                }
                 });
                 res.json(sells);
             } catch (error) {
@@ -58,6 +67,15 @@ module.exports = {
     },
     confirm: async (req, res) => {
         try {
+            const sells = await prisma.sell.findMany({
+                where: { status: 'pending' },
+            });
+            for (const sell of sells) {
+                await prisma.product.update({
+                    where: { id: sell.productId },
+                    data: { status: 'sold' }
+                });
+            }
             await prisma.sell.updateMany({
                 where: { status: 'pending' },
                 data: { status: 'paid',

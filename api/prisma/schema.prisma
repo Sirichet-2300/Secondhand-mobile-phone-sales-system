@@ -53,3 +53,11 @@ model Sell {
   price     Int 
   payDate   DateTime 
 }
+
+model Service{
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  price     Int
+  remark    String?
+  paydate   DateTime
+}

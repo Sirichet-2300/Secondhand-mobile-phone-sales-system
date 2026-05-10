@@ -17,14 +17,22 @@ export default function Page() {
         try {
             const payload = { serial: serial, price: price };
             await axios.post(`${config.apiUrl}/sell/create`, payload);
-
             fetchData();
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "เกิดข้อผิดพลาด",
-                text: "Failed to sell product",
-            });
+        } catch (error: any) {
+            if (error.response.status === 400) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "เกิดข้อผิดพลาด",
+                        text: "Failed to sell product",
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "เกิดข้อผิดพลาด",
+                        text: "error.message"
+                    });
+
+            }
         }
     };
     const fetchData = async () => {
