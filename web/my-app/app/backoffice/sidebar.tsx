@@ -122,7 +122,7 @@ useEffect(() => {
           
         </div>
         <div>
-          <Link href="/backoffice/users">
+          <Link href="/backoffice/user">
             <i className="fa fa-users nr-2 w -[25px] text-center"></i>
           ผู้ใช้งาน
           </Link>
