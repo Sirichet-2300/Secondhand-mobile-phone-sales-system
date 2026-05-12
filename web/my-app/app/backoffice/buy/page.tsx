@@ -148,6 +148,27 @@ export default function Page() {
     setQty(1);
   };
 
+  const exportToExcel = async () => {
+    try {
+
+      const payload = { products: products };
+      const response = await axios.post(`${config.apiUrl}/buy/export`, payload);
+      const fileName = response.data.fileName;
+      const a = document.createElement('a');
+      a.href = config.apiUrl + "/uploads/" + fileName;
+      a.download = fileName;
+      a.target = "_blank";
+      a.click();
+        
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาดในการส่งออก Excel",
+        text: error.message
+      });
+    }
+  }
+
   return (
     <div>
       <h1 className="content-header">รายการซื้อ</h1>
@@ -159,6 +180,10 @@ export default function Page() {
           <i className="fa-solid fa-plus mr-2">เพิ่มรายการ</i>
         </button>
 
+        <button className="btn ms-1" onClick={exportToExcel}>
+          <i className="fa-solid fa-file-excel mr-2"></i>
+          ส่งออก Excel
+        </button>
         <table className="table mt-3">
           <thead>
             <tr>

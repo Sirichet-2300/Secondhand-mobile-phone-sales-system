@@ -12,6 +12,7 @@ const { ServiceController } = require('./controllers/ServiceController');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/uploads', express.static('uploads'));
 
 // ✅ All routes first
 app.get("/", (req, res) => {
@@ -34,6 +35,7 @@ app.get("/api/buy/list/:page", ProductController.list);
 app.put("/api/buy/update/:id", ProductController.update);
 app.delete("/api/buy/remove/:id", ProductController.remove);
 app.post("/api/buy/create", ProductController.create);
+app.post("/api/buy/export", ProductController.exportToExcel);
 
 //sell
 app.post("/api/sell/create", SellController.create);
