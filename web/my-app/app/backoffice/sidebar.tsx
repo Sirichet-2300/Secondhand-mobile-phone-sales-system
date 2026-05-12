@@ -87,6 +87,8 @@ useEffect(() => {
         </div>
       </div>
       <div className="p-5 text-white text-xl flex flex-col gap-2">
+        {level === "admin" && (
+          <>
         <div>
           <Link href="/backoffice/dashboard">
             <i className="fa fa-tachometer-alt nr-2 w -[25px] text-center"></i>
@@ -100,6 +102,8 @@ useEffect(() => {
           </Link>
           
         </div>
+        </>
+          )}
         <div>
           <Link href="/backoffice/sell">
             <i className="fa fa-dollar-sign nr-2 w -[25px] text-center"></i>
@@ -114,6 +118,8 @@ useEffect(() => {
           </Link>
           
         </div>
+        {level === "admin" && (
+          <>
         <div>
           <Link href="/backoffice/company">
             <i className="fa fa-building nr-2 w -[25px] text-center"></i>
@@ -128,6 +134,8 @@ useEffect(() => {
           </Link>
           
         </div>
+        </>
+        )}
       </div>
       <Modal title="แก้ไขข้อมูลผู้ใช้งาน"isOpen={isShow} onClose={handleCloseModal}>
         <div>

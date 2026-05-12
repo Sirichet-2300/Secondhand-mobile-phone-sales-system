@@ -24,7 +24,7 @@ module.exports = {
 
                 const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { expiresIn: '7d' });
                 console.log("SECRET_KEY: ", process.env.SECRET_KEY);
-                res.json({ token: token });
+                res.json({ token: token, level: user.level });
             } catch (error) {
                 res.status(500).json({ message: error.message });
             }
