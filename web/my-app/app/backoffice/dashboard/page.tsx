@@ -1,18 +1,40 @@
 'use client'
 
-import { title } from "process"
 import { useState, useEffect } from "react"
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
     Tooltip, Legend, ResponsiveContainer
 } from "recharts"
+import { config } from "@/app/config";
+import Swal from "sweetalert2";
+import axios from "axios";
+
+
 export default function Page() {
     const [data, setData] = useState<any[]>([])
+    const [totalIncome, setTotalIncome] = useState(0)
+    const [totalRepair, setTotalRepair] = useState(0)
+    const [totalSale, setTotalSale] = useState(0)
 
     useEffect(() => {
+        fetchData();
         renderChart();
     }, [])
 
+    const fetchData = async () => {
+        try {
+            const res = await axios.get(`${config.apiUrl}/sell/dashboard`);
+            setTotalIncome(Number(res.data.totalIncome ?? 0));
+            setTotalRepair(Number(res.data.totalRepair ?? 0));
+            setTotalSale(Number(res.data.totalSale ?? res.data.totalSell ?? 0));
+        } catch (error: any) {
+            Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: error.message,
+            });
+        }
+    }
     const renderChart = async () => {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         const data = months.map((month) => ({
@@ -35,9 +57,9 @@ export default function Page() {
         <div>
             <h1 className="content-header">Dashboard</h1>
             <div className="flex gap-4">
-                {box('bg-purple-600','ยอดขายทั้งหมด', '100,000')}
-                {box('bg-orange-500', 'งานรับซ่อม', '100งาน')}
-                {box('bg-blue-500', 'รายการขาย','999รายการ')}
+                {box('bg-purple-600','ยอดขายทั้งหมด', totalIncome.toLocaleString() + ' บาท')}
+                {box('bg-orange-500', 'งานรับซ่อม', totalRepair.toLocaleString() + ' งาน')}
+                {box('bg-blue-500', 'รายการขาย', totalSale.toLocaleString() + ' รายการ')}
             </div>
             <div className="text-center mb-4 mt-5 text-xl font-bold">รายได้แต่ละเดือน</div>
             <div style={{ width: '100%', height: 300 }}>
