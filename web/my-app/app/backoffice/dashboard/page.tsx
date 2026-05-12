@@ -1,7 +1,57 @@
-export  default function Page() {
+'use client'
+
+import { title } from "process"
+import { useState, useEffect } from "react"
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid,
+    Tooltip, Legend, ResponsiveContainer
+} from "recharts"
+export default function Page() {
+    const [data, setData] = useState<any[]>([])
+
+    useEffect(() => {
+        renderChart();
+    }, [])
+
+    const renderChart = async () => {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        const data = months.map((month) => ({
+            name: month,
+            income: Math.floor(Math.random() * 10000)
+        }))
+        setData(data)
+    }
+
+    const box = (color: string, title: string, value: string) => {
+        return (
+            <div className={`flex flex-col gap-4 items-end w-full ${color} p-4 rounded-lg text-white`}>
+                <h3 className="text-2xl font-bold">{title}</h3>
+                <p className="text-4xl font-bold">${value}</p>
+            </div>
+        )
+    }
+
     return (
         <div>
-            <h1>Dashboard</h1>
+            <h1 className="content-header">Dashboard</h1>
+            <div className="flex gap-4">
+                {box('bg-purple-600','ยอดขายทั้งหมด', '100,000')}
+                {box('bg-orange-500', 'งานรับซ่อม', '100งาน')}
+                {box('bg-blue-500', 'รายการขาย','999รายการ')}
+            </div>
+            <div className="text-center mb-4 mt-5 text-xl font-bold">รายได้แต่ละเดือน</div>
+            <div style={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer>
+                    <BarChart data={data}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={(value:number)=> 'รายได้ ${value.toLocaleString()} บาท'}/>
+                        <Legend />
+                        <Bar dataKey="income" fill="teal" opacity={0.5} />
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     )
 }
