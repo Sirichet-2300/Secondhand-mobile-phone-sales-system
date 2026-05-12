@@ -34,13 +34,26 @@ module.exports = {
     },
     list: async (req, res) => {
       try {
-        const products = await prisma.product.findMany({
-          orderBy: { id: "asc" },
+        //pagination
+        const page = req.params.page ?? 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+        const totalRows = await prisma.product.count({
           where:{
             status:{not: "delete"}
           }
         });
-        res.json(products);
+        const totalPage = Math.ceil(totalRows / limit);
+
+        const products = await prisma.product.findMany({
+          orderBy: { id: "asc" },
+          where:{
+            status:{not: "delete"}
+          },
+          skip: skip,
+          take: limit,
+        });
+        res.json({ products, totalPage, page, totalRows});
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
