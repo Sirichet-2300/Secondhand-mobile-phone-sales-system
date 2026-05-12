@@ -1,4 +1,5 @@
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client');
+const { info } = require('console');
 const prisma = new PrismaClient()
 
 module.exports = {
@@ -8,9 +9,10 @@ module.exports = {
                 const serial = req.body.serial;
                 const product = await prisma.product.findFirst({
 
-                    where: { serial: serial,
+                    where: {
+                        serial: serial,
                         status: 'instock'
-                     },
+                    },
                 });
                 if (!product) {
                     res.status(400).json({ error: 'Product not found.' });
@@ -48,7 +50,7 @@ module.exports = {
                         },
                         id: true,
                         price: true,
-                }
+                    }
                 });
                 res.json(sells);
             } catch (error) {
@@ -64,47 +66,80 @@ module.exports = {
             } catch (error) {
                 res.status(500).json({ message: error.message });
             }
-    },
-    confirm: async (req, res) => {
-        try {
-            const sells = await prisma.sell.findMany({
-                where: { status: 'pending' },
-            });
-            for (const sell of sells) {
-                await prisma.product.update({
-                    where: { id: sell.productId },
-                    data: { status: 'sold' }
+        },
+        confirm: async (req, res) => {
+            try {
+                const sells = await prisma.sell.findMany({
+                    where: { status: 'pending' },
                 });
+                for (const sell of sells) {
+                    await prisma.product.update({
+                        where: { id: sell.productId },
+                        data: { status: 'sold' }
+                    });
+                }
+                await prisma.sell.updateMany({
+                    where: { status: 'pending' },
+                    data: {
+                        status: 'paid',
+                        payDate: new Date()
+                    },
+                });
+                res.json({ message: 'Sell records confirmed successfully.' });
+            } catch (error) {
+                res.status(500).json({ message: error.message });
             }
-            await prisma.sell.updateMany({
-                where: { status: 'pending' },
-                data: { status: 'paid',
-                    payDate: new Date()
-                 },
-            });
-            res.json({ message: 'Sell records confirmed successfully.' });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
+        },
+        dashboard: async (req, res) => {
+            try {
+                const income = await prisma.sell.aggregate({
+                    _sum: { price: true },
+                    where: { status: 'paid' },
+                });
+                const countRepair = await prisma.service.count();
+                const countSell = await prisma.sell.count({
+                    where: { status: 'paid' },
+                });
+                return res.json({
+                    totalIncome: income._sum.price,
+                    totalRepair: countRepair,
+                    totalSale: countSell,
+                    totalSell: countSell,
+                });
+            } catch (error) {
+                res.status(500).json({ message: error.message });
+            }
+        },
+        history: async (req, res) => {
+            try {
+                const sells = await prisma.sell.findMany({
+                    where: { status: 'paid' },
+                    orderBy: { id: 'desc' },
+                    include: {
+                        product: {
+                            select: {
+                                name: true,
+                                serial: true,
+                            }
+                        }
+                    }
+                });
+                res.json(sells);
+            } catch (error) {
+                res.status(500).json({ message: error.message });
+            }
     },
-    dashboard: async (req, res) => {
+    info: async (req, res) => {
         try {
-            const income = await prisma.sell.aggregate({
-                _sum: { price: true },
-                where: { status: 'paid' },
+            const sell = await prisma.sell.findUnique({
+                where: { id: req.params.id, status: 'paid' },
+                include: {
+                    product: true}
             });
-            const countRepair = await prisma.service.count();
-            const countSell = await prisma.sell.count({
-                where: { status: 'paid' },
-            });
-            return res.json({
-                totalIncome: income._sum.price,
-                totalRepair: countRepair,
-                totalSale: countSell,
-                totalSell: countSell,
-            });
+            res.json(sell);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
+    }
 }
-}}
+}

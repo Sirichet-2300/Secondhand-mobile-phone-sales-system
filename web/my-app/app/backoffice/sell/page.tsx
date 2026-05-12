@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { config } from "@/app/config";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 
 export default function Page() {
@@ -12,6 +13,7 @@ export default function Page() {
     const [sells, setSells] = useState([]);
     const [id, setId] = useState(0);
     const [totalAmount, setTotalAmount] = useState(0);
+    const router = useRouter();
 
     const handleSave = async () => {
         try {
@@ -20,17 +22,17 @@ export default function Page() {
             fetchData();
         } catch (error: any) {
             if (error.response.status === 400) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "เกิดข้อผิดพลาด",
-                        text: "Failed to sell product",
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "เกิดข้อผิดพลาด",
-                        text: "error.message"
-                    });
+                Swal.fire({
+                    icon: "error",
+                    title: "เกิดข้อผิดพลาด",
+                    text: "Failed to sell product",
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "เกิดข้อผิดพลาด",
+                    text: "error.message"
+                });
 
             }
         }
@@ -104,7 +106,15 @@ export default function Page() {
 
     return (
         <div>
-            <div className="content-header">ขายสินค้า</div>
+            <div className="content-header flex justify-between">
+                <div>ขายสินค้า</div>
+                <div>
+                    <button className="btn text-lg" onClick={() => router.push('/backoffice/sell/history')}>
+                        <i className="fa-solid fa-file-alt mr-3">
+                            ประวัติการขาย</i>
+                    </button>
+                </div>
+            </div>
             <div className="flex gap-2 items-end">
                 <div className="w-full">
                     <div>Serial</div>
