@@ -47,6 +47,10 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 //user
 app.post("/api/user/signin", UserController.signIn);
 app.get("/api/user/info", UserController.info);
