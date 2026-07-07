@@ -1,7 +1,11 @@
 const express = require('express');
+require('dotenv').config();
+
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 
 const { UserController } = require('./controllers/UserController');
 const { CompanyController } = require('./controllers/CompanyController');
@@ -9,14 +13,39 @@ const { ProductController } = require('./controllers/ProductController');
 const { SellController } = require('./controllers/SellController');
 const { ServiceController } = require('./controllers/ServiceController');
 
-app.use(cors());
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins.length
+    ? (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+      }
+    : true,
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/uploads', express.static('uploads'));
+
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+app.use('/api/uploads', express.static(uploadsDir));
 
 // ✅ All routes first
 app.get("/", (req, res) => {
   res.send("Hello World");
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 //user
 app.post("/api/user/signin", UserController.signIn);
@@ -52,6 +81,10 @@ app.get("/api/service/list", ServiceController.list);
 app.put("/api/service/update/:id", ServiceController.update);
 app.delete("/api/service/remove/:id", ServiceController.remove);
 // ✅ listen() always last
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
+
+module.exports = app;

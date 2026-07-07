@@ -1,59 +1,140 @@
 @import "tailwindcss";
 
-.signin-container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+:root {
+  --app-bg: #f5f7fb;
+  --app-surface: #ffffff;
+  --app-border: #d9e2ec;
+  --app-muted: #64748b;
+  --app-text: #0f172a;
+  --app-primary: #0f766e;
+  --app-primary-dark: #115e59;
+  --app-primary-soft: #ccfbf1;
+  --app-sidebar: #0f172a;
 }
 
-.signin-box{
-  @apply rounded-lg bg-white p-5 shadow-lg shadow-teal-800 flex flex-col items-start;
-}
-.signin-box h1{
-  @apply mb-5;
-}
-input {
-  @apply p-2 rounded-md border border-gray-600 w-full;
+* {
+  box-sizing: border-box;
 }
 
-.form-control{
-  @apply p-2 rounded-md border border-gray-600 w-full ;
+html {
+  background: var(--app-bg);
 }
+
 body {
-  @apply bg-gradient-to-tr from-indigo-600  to-teal-700;
+  @apply min-h-screen text-slate-900;
+  background:
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 34rem),
+    linear-gradient(180deg, #f8fafc 0%, #eef4f8 100%);
 }
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea,
+.form-control {
+  @apply w-full rounded-md border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition;
+  border-color: var(--app-border);
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus {
+  @apply border-teal-600 ring-4 ring-teal-100;
+}
+
+input::placeholder,
+textarea::placeholder {
+  @apply text-slate-400;
+}
+
+.signin-container {
+  @apply flex min-h-screen items-center justify-center px-4 py-10;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.92), rgba(30, 64, 175, 0.82)),
+    url("/window.svg");
+  background-size: cover;
+  background-position: center;
+}
+
+.signin-box {
+  @apply flex w-full max-w-md flex-col rounded-lg border border-white/50 bg-white/95 p-8 shadow-2xl shadow-slate-950/20 backdrop-blur;
+}
+
+.signin-box h1 {
+  @apply mb-6 text-3xl font-bold tracking-normal text-slate-950;
+}
+
+.signin-box div {
+  @apply text-sm font-medium text-slate-700;
+}
+
 .signin-box button {
-  @apply mt-4 bg-teal-600 text-white px-6 py-2 rounded-md;
+  @apply mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-md bg-teal-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-200;
 }
-.btn{
-  @apply bg-teal-600 text-white px-6 py-2 rounded-md;
+
+.btn {
+  @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-100 disabled:cursor-not-allowed disabled:opacity-60;
 }
-.btn-active{
-  @apply bg-white border-2 border-teal-600 text-teal-600;
+
+.btn-active {
+  @apply border border-teal-700 bg-white text-teal-700 shadow-none hover:bg-teal-50;
 }
-.content-header{
-  @apply text-2xl font-bold mb-5 pt-0 pb-3 border-b-2 border-teal-600 text-teal-600;
+
+.btn-edit {
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-md bg-blue-600 text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100;
+}
+
+.btn-delete {
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-md bg-rose-600 text-white shadow-sm transition hover:bg-rose-700 focus:outline-none focus:ring-4 focus:ring-rose-100;
+}
+
+.content-header {
+  @apply mb-5 border-b border-slate-200 pb-4 text-2xl font-bold tracking-normal text-slate-950;
 }
 
 .table {
-  @apply w-full;
+  @apply w-full overflow-hidden rounded-lg border border-slate-200 bg-white text-sm shadow-sm;
 }
+
 .table thead {
-  @apply bg-teal-600 text-white;
+  @apply bg-slate-900 text-white;
 }
+
 .table thead th {
-  @apply p-3 text-left;
+  @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide;
 }
-.table tbody tr{
-  @apply border-b border-gray-300;
+
+.table tbody tr {
+  @apply border-b border-slate-100 transition last:border-b-0 hover:bg-teal-50/60;
 }
+
 .table tbody td {
-  @apply p-3  bg-gray-100;
+  @apply bg-transparent px-4 py-3 align-middle text-slate-700;
 }
-.btn-edit{
-  @apply bg-blue-600 text-white px-3 py-2 rounded-md;
+
+.app-shell {
+  @apply flex min-h-screen bg-slate-100;
 }
-.btn-delete{
-  @apply bg-red-600 text-white px-3 py-2 rounded-md;
+
+.app-main {
+  @apply min-w-0 flex-1 overflow-auto p-4 md:p-6 lg:p-8;
+}
+
+.app-content {
+  @apply mx-auto w-full max-w-7xl;
+}
+
+.dashboard-toolbar {
+  @apply mb-5 flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm;
+}
+
+.chart-panel {
+  @apply mt-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm;
 }

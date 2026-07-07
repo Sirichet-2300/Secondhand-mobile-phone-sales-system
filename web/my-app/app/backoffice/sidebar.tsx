@@ -1,168 +1,187 @@
 'use client';
+
 import Link from "next/link";
-import { useState, useEffect, } from "react";
-import { config } from "@/app/config";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
+import { config } from "@/app/config";
 import Modal from "@/app/backoffice/modal";
 
 export default function Sidebar() {
   const [name, setName] = useState("");
-  const router = useRouter();
   const [level, setLevel] = useState("");
   const [isShow, setShowModal] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const handleShowModal = () => {
-    setShowModal(true);
-  }
-  const handleCloseModal = () => {
-    setShowModal(false);
-  }
-  
-  
-  const fetchData = async () => {
-    
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const applyUserData = (data: { name: string; level: string; username: string }) => {
+    setName(data.name);
+    setLevel(data.level);
+    setUsername(data.username);
+  };
+
+  const getHeaders = () => {
     const token = localStorage.getItem("token");
-    
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-    }
-    const res = await axios.get(`${config.apiUrl}/user/info`, { 
-      headers:headers });
-    setName(res.data.name);
-    setLevel(res.data.level);
-    setUsername(res.data.username);
-  }
+    return {
+      Authorization: `Bearer ${token}`,
+    };
+  };
 
-useEffect(() => {
-  fetchData();
-  }, [])
-  
+  const fetchData = async () => {
+    const headers = getHeaders();
+    const res = await axios.get(`${config.apiUrl}/user/info`, { headers });
+    applyUserData(res.data);
+  };
+
+  useEffect(() => {
+    let isActive = true;
+
+    axios.get(`${config.apiUrl}/user/info`, { headers: getHeaders() })
+      .then((res) => {
+        if (!isActive) return;
+        applyUserData(res.data);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/");
-  }
+  };
 
   const handleSave = async () => {
-    if(password !== confirmPassword){
+    if (password !== confirmPassword) {
       Swal.fire({
-        icon: 'error',
-        title: 'เกิดข้อผิดพลาด',
-        text: 'password ไม่ตรงกัน'
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "password ไม่ตรงกัน",
       });
       return;
     }
-    //save data
-    const payload = {
-      name: name,
-      username: username,
-      password: password,
-      level: level
-    }
-    const token = localStorage.getItem("token");
-    const headers = {'Authorization': `Bearer ${token}`}
-    await axios.put(`${config.apiUrl}/user/update`, payload, { headers })
-      fetchData()
-      handleCloseModal()
-    }
 
+    const payload = {
+      name,
+      username,
+      password,
+      level,
+    };
+    const token = localStorage.getItem("token");
+    const headers = { Authorization: `Bearer ${token}` };
+    await axios.put(`${config.apiUrl}/user/update`, payload, { headers });
+    fetchData();
+    handleCloseModal();
+  };
+
+  const navClass = (href: string) => {
+    const isActive = pathname === href;
+    return `flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
+      isActive
+        ? "bg-teal-500 text-white shadow-sm"
+        : "text-slate-300 hover:bg-white/10 hover:text-white"
+    }`;
+  };
 
   return (
-    <div className="bg-teal-600 h-screen w-64 ">
-      <div className="p-5 bg-teal-800 text-white text-xl">
-        <h1>Mobileshop Version 1.0</h1>
-        <div className="flex items-center gap-2 mt-3">
-          <i className="fa fa-user"></i>
-          <span className="w-full">{name}:{level}</span>
-          <button onClick={handleShowModal} className="bg-blue-500 rounded-full px-2 py-1">
-            <i className="fa fa-pencil"></i>
-          </button>
-          <button onClick={handleLogout}className="bg-red-500 rounded-full px-2 py-1">
-            <i className="fa fa-sign-out-alt"></i>
-          </button>
-        </div>
-      </div>
-      <div className="p-5 text-white text-xl flex flex-col gap-2">
-        {level === "admin" && (
-          <>
-        <div>
-          <Link href="/backoffice/dashboard">
-            <i className="fa fa-tachometer-alt nr-2 w -[25px] text-center"></i>
-          Dashboard
-          </Link>
-        </div>
-        <div>
-          <Link href="/backoffice/buy">
-            <i className="fa fa-shopping-cart nr-2 w -[25px] text-center"></i>
-          ซื้อสินค้า
-          </Link>
-          
-        </div>
-        </>
-          )}
-        <div>
-          <Link href="/backoffice/sell">
-            <i className="fa fa-dollar-sign nr-2 w -[25px] text-center"></i>
-          ขายสินค้า
-          </Link>
-          
-        </div>
-        <div>
-          <Link href="/backoffice/repair">
-            <i className="fa fa-wrench nr-2 w -[25px] text-center"></i>
-          รับซ่อม
-          </Link>
-          
-        </div>
-        {level === "admin" && (
-          <>
-        <div>
-          <Link href="/backoffice/company">
-            <i className="fa fa-building nr-2 w -[25px] text-center"></i>
-          ข้อมูลร้าน
-          </Link>
-          
-        </div>
-        <div>
-          <Link href="/backoffice/user">
-            <i className="fa fa-users nr-2 w -[25px] text-center"></i>
-          ผู้ใช้งาน
-          </Link>
-          
-        </div>
-        </>
-        )}
-      </div>
-      <Modal title="แก้ไขข้อมูลผู้ใช้งาน"isOpen={isShow} onClose={handleCloseModal}>
-        <div>
-          <div>ชื่อผู้ใช้งาน</div>
-          <input type="text" value={name} onChange={(e)=> setName(e.target.value)} 
-          className="form-control"/>
-
-          <div className="mt-3">username</div>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} 
-          className="form-control"/>
-
-          <div className="mt-3">password</div>
-          <input type="password"  onChange={(e) => setPassword(e.target.value)} 
-          className="form-control"/>
-
-          <div className="mt-3">confirm password</div>
-          <input type="password"  onChange={(e) => setConfirmPassword(e.target.value)} 
-          className="form-control"/>
-
-          <div className="mt-3">
-            <button className="btn" onClick={handleSave}>
-              <i className="fa-solid fa-save mr-2"> บันทึก</i>
-            </button>
+    <aside className="sticky top-0 flex h-screen w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-950 text-white">
+      <div className="border-b border-white/10 p-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-teal-500 text-lg shadow-lg shadow-teal-950/30">
+            <i className="fa fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h1 className="text-lg font-bold leading-tight">Mobileshop</h1>
+            <p className="text-xs font-medium text-slate-400">Backoffice v1.0</p>
           </div>
         </div>
 
+        <div className="mt-5 rounded-lg border border-white/10 bg-white/5 p-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-800 text-slate-200">
+              <i className="fa fa-user"></i>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-semibold">{name || "User"}</div>
+              <div className="text-xs uppercase tracking-wide text-teal-300">{level || "staff"}</div>
+            </div>
+            <button onClick={handleShowModal} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition hover:bg-white/10 hover:text-white">
+              <i className="fa fa-pencil"></i>
+            </button>
+            <button onClick={handleLogout} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-rose-300 transition hover:bg-rose-500/15 hover:text-rose-200">
+              <i className="fa fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <nav className="flex flex-1 flex-col gap-1 p-4">
+        {level === "admin" && (
+          <>
+            <Link href="/backoffice/dashboard" className={navClass("/backoffice/dashboard")}>
+              <i className="fa fa-tachometer-alt w-5 text-center"></i>
+              <span>Dashboard</span>
+            </Link>
+            <Link href="/backoffice/buy" className={navClass("/backoffice/buy")}>
+              <i className="fa fa-shopping-cart w-5 text-center"></i>
+              <span>ซื้อสินค้า</span>
+            </Link>
+          </>
+        )}
+
+        <Link href="/backoffice/sell" className={navClass("/backoffice/sell")}>
+          <i className="fa fa-dollar-sign w-5 text-center"></i>
+          <span>ขายสินค้า</span>
+        </Link>
+        <Link href="/backoffice/repair" className={navClass("/backoffice/repair")}>
+          <i className="fa fa-wrench w-5 text-center"></i>
+          <span>รับซ่อม</span>
+        </Link>
+
+        {level === "admin" && (
+          <>
+            <Link href="/backoffice/company" className={navClass("/backoffice/company")}>
+              <i className="fa fa-building w-5 text-center"></i>
+              <span>ข้อมูลร้าน</span>
+            </Link>
+            <Link href="/backoffice/user" className={navClass("/backoffice/user")}>
+              <i className="fa fa-users w-5 text-center"></i>
+              <span>ผู้ใช้งาน</span>
+            </Link>
+          </>
+        )}
+      </nav>
+
+      <Modal title="แก้ไขข้อมูลผู้ใช้งาน" isOpen={isShow} onClose={handleCloseModal}>
+        <div>
+          <div>ชื่อผู้ใช้งาน</div>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="form-control" />
+
+          <div className="mt-3">username</div>
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" />
+
+          <div className="mt-3">password</div>
+          <input type="password" onChange={(e) => setPassword(e.target.value)} className="form-control" />
+
+          <div className="mt-3">confirm password</div>
+          <input type="password" onChange={(e) => setConfirmPassword(e.target.value)} className="form-control" />
+
+          <div className="mt-5">
+            <button className="btn" onClick={handleSave}>
+              <i className="fa-solid fa-save"></i>
+              <span>บันทึก</span>
+            </button>
+          </div>
+        </div>
       </Modal>
-    </div>
+    </aside>
   );
 }

@@ -145,7 +145,7 @@ export default function Page() {
     setCustomerPhone("");
     setCustomerAddress("");
     setRemark("");
-    setQty(1);
+    setQty("1");
   };
 
   const exportToExcel = async () => {
@@ -316,7 +316,7 @@ export default function Page() {
         <input
           type="text"
           value={qty}
-          onChange={(e) => setQty(Number(e.target.value ?? 0))}
+          onChange={(e) => setQty(e.target.value ?? "0")}
         />
 
         <div className="mt-2">
