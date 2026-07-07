@@ -13,10 +13,14 @@ const { ProductController } = require('./controllers/ProductController');
 const { SellController } = require('./controllers/SellController');
 const { ServiceController } = require('./controllers/ServiceController');
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "")
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  ...(process.env.CORS_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim())
-  .filter(Boolean);
+  .filter(Boolean),
+];
 
 app.use(cors({
   origin: allowedOrigins.length
