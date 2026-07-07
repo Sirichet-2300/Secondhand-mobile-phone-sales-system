@@ -34,14 +34,21 @@ export default function SignIn() {
           timer: 2000
         })
       }
-    } catch (error: any) {
-      if (error.response.status === 401) {
-        alert('Unauthorized: Invalid username or password')
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Sign In Failed',
+          text: 'Invalid username or password',
+          timer: 2000
+        })
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Sign In Error',
-          text: 'An error occurred during sign in. Please try again later.',
+          text: axios.isAxiosError(error)
+            ? error.response?.data?.message ?? error.message
+            : 'An error occurred during sign in. Please try again later.',
         })
       }
     }
@@ -51,7 +58,15 @@ export default function SignIn() {
   return (
     <div className='signin-container'>
       <div className="signin-box">
-        <h1 className='text-2xl font-bold'>Sign In</h1>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-teal-700 text-xl text-white shadow-lg shadow-teal-900/20">
+            <i className="fa fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h1>Mobileshop</h1>
+            <p className="text-sm text-slate-500">Sign in to continue</p>
+          </div>
+        </div>
         <div>Username</div>
         <input
           type='text'
@@ -67,8 +82,8 @@ export default function SignIn() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className='mt-4' onClick={handleSignIn}>
-          Sign In
-          <i className='fa fa-sign-in-alt ml-2'></i>
+          <span>Sign In</span>
+          <i className='fa fa-sign-in-alt'></i>
         </button>
       </div>
     </div>

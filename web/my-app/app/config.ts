@@ -1,5 +1,5 @@
 export const config = {
-  apiUrl: 'http://localhost:3001/api',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
   timeout: 5000,
   retryAttempts: 3,
 };

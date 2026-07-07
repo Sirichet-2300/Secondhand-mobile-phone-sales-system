@@ -4,11 +4,11 @@ export default function BackofficeLayout({ children }: {
     children: React.ReactNode 
 }) {
     return (
-        <div className="flex">
+        <div className="app-shell">
             <Sidebar />
-            <div className="flex-1 p-5 bg-gray-200 h-screen">
-                <div className="bg-white p-5 rounded-lg shadow-lg shadow-gray-500">
-                {children}
+            <div className="app-main">
+                <div className="app-content">
+                    {children}
                 </div>
             </div>
         </div>

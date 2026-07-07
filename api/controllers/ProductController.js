@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const XLSX = require("xlsx");
+const path = require("path");
 
 module.exports = {
   ProductController: {
@@ -101,7 +102,7 @@ module.exports = {
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
         //write to file
-        XLSX.writeFile(workbook, './uploads/' + fileName);
+        XLSX.writeFile(workbook, path.join(__dirname, "..", "uploads", fileName));
         res.json({ fileName: fileName });
       
       } catch (error) {
