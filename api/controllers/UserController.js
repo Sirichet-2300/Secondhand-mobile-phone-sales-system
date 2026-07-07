@@ -82,6 +82,14 @@ module.exports = {
         },
         create: async (req, res) => {
             try {
+                const existingUser = await prisma.user.findFirst({
+                    where: { username: req.body.username },
+                });
+
+                if (existingUser) {
+                    return res.status(409).json({ message: 'Username already exists' });
+                }
+
                 await prisma.user.create({
                     data: {
                         name: req.body.name,
